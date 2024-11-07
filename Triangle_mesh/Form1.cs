@@ -1,12 +1,16 @@
 using System.Numerics;
+using Microsoft.VisualBasic.ApplicationServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Triangle_mesh
 {
     public partial class Form1 : Form
     {
+        private bool IsAnimated = true;
         private bool IsOnlyMesh = false;
         private bool IsOnlyFill = false;
+        private bool IsTexture = false;
+        private Bitmap Texture;
         private Mesh mesh;
         private Color objectcolor = Color.Red;
         private Color lightcolor = Color.White;
@@ -21,6 +25,8 @@ namespace Triangle_mesh
         {
             string path = "../../../ControlPoints2.txt";
             mesh = new Mesh(Mesh.ReadControlPoints(path));
+            string path2 = "C:\\Users\\xx-ma\\OneDrive\\Obrazy\\Zrzuty ekranu\\Screenshot 2024-02-17 020028.png";
+            Texture = new Bitmap(path2);
             Task.Run(() =>
             {
                 //Thread.Sleep(100);
@@ -31,8 +37,11 @@ namespace Triangle_mesh
                     {
                         pictureBox1.Invalidate();
                         //light = new Vector3(100 * (float)Math.Sin(DateTime.Now.Millisecond / 100), 100 * (float)Math.Cos(DateTime.Now.Millisecond / 100), -200);
-                        long time = DateTimeOffset.Now.ToUnixTimeMilliseconds() / 100;
-                        light = new Vector3(100 * (float)Math.Sin(time), 100 * (float)Math.Cos(time), zTrackBar.Value);
+                        if (IsAnimated)
+                        {
+                            long time = DateTimeOffset.Now.ToUnixTimeMilliseconds() / 100;
+                            light = new Vector3(100 * (float)Math.Sin(time), 100 * (float)Math.Cos(time), zTrackBar.Value);
+                        }
                     }));
 
                     //pictureBox1.Invalidate();
@@ -57,7 +66,7 @@ namespace Triangle_mesh
             Bitmap BM = new Bitmap(pictureBox1.Width, pictureBox1.Height);
 
             mesh.Draw(BM, e, mTrackBar.Value, (float)kdTrackBar.Value / 10, (float)ksTrackBar.Value / 10,
-                lightcolor, objectcolor, light, IsOnlyMesh, IsOnlyFill);
+                lightcolor, objectcolor, light, IsOnlyMesh, IsOnlyFill, IsTexture, Texture);
             e.Graphics.DrawImage(BM, -250, -250);
         }
 
@@ -106,12 +115,38 @@ namespace Triangle_mesh
         {
             IsOnlyMesh = meshCheckbox.Checked;
             fillingCheckbox.Checked = false;
+            IsOnlyFill = false;
         }
 
         private void fillingCheckbox_Click(object sender, EventArgs e)
         {
             IsOnlyFill = fillingCheckbox.Checked;
             meshCheckbox.Checked = false;
+            IsOnlyMesh = false;
+        }
+
+        private void stopButton_Click(object sender, EventArgs e)
+        {
+            if (IsAnimated)
+            {
+                stopButton.Text = "Resume";
+                IsAnimated = false;
+            }
+            else
+            {
+                stopButton.Text = "Stop the light";
+                IsAnimated = true;
+            }
+        }
+
+        private void colorRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            IsTexture = !colorRadioButton.Checked;
+        }
+
+        private void textureRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            IsTexture = !colorRadioButton.Checked;
         }
     }
 }

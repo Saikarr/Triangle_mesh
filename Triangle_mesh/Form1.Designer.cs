@@ -45,6 +45,9 @@
             zTrackBar = new TrackBar();
             zLabel = new Label();
             groupBox2 = new GroupBox();
+            textureRadioButton = new RadioButton();
+            colorRadioButton = new RadioButton();
+            stopButton = new Button();
             fillingCheckbox = new CheckBox();
             meshCheckbox = new CheckBox();
             lightPictureBox = new PictureBox();
@@ -229,6 +232,9 @@
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(textureRadioButton);
+            groupBox2.Controls.Add(colorRadioButton);
+            groupBox2.Controls.Add(stopButton);
             groupBox2.Controls.Add(fillingCheckbox);
             groupBox2.Controls.Add(meshCheckbox);
             groupBox2.Controls.Add(lightPictureBox);
@@ -244,6 +250,40 @@
             groupBox2.TabIndex = 8;
             groupBox2.TabStop = false;
             groupBox2.Text = "groupBox2";
+            // 
+            // textureRadioButton
+            // 
+            textureRadioButton.AutoSize = true;
+            textureRadioButton.Location = new Point(6, 375);
+            textureRadioButton.Name = "textureRadioButton";
+            textureRadioButton.Size = new Size(78, 24);
+            textureRadioButton.TabIndex = 19;
+            textureRadioButton.TabStop = true;
+            textureRadioButton.Text = "Texture";
+            textureRadioButton.UseVisualStyleBackColor = true;
+            textureRadioButton.CheckedChanged += textureRadioButton_CheckedChanged;
+            // 
+            // colorRadioButton
+            // 
+            colorRadioButton.AutoSize = true;
+            colorRadioButton.Location = new Point(6, 345);
+            colorRadioButton.Name = "colorRadioButton";
+            colorRadioButton.Size = new Size(105, 24);
+            colorRadioButton.TabIndex = 18;
+            colorRadioButton.TabStop = true;
+            colorRadioButton.Text = "Same color";
+            colorRadioButton.UseVisualStyleBackColor = true;
+            colorRadioButton.CheckedChanged += colorRadioButton_CheckedChanged;
+            // 
+            // stopButton
+            // 
+            stopButton.Location = new Point(6, 298);
+            stopButton.Name = "stopButton";
+            stopButton.Size = new Size(127, 29);
+            stopButton.TabIndex = 17;
+            stopButton.Text = "Stop the light";
+            stopButton.UseVisualStyleBackColor = true;
+            stopButton.Click += stopButton_Click;
             // 
             // fillingCheckbox
             // 
@@ -369,5 +409,8 @@
         private PictureBox objectPictureBox;
         private CheckBox fillingCheckbox;
         private CheckBox meshCheckbox;
+        private Button stopButton;
+        private RadioButton textureRadioButton;
+        private RadioButton colorRadioButton;
     }
 }

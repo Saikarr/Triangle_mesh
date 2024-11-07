@@ -100,9 +100,11 @@ namespace Triangle_mesh
             }
         }
 
-        public void FillPolygon(Graphics graphics, Point[] vertices, Triangle triangle, int m, float kd, float ks, 
-            Bitmap BM, Vector3 LightColor, Vector3 ObjectColor, Vector3 light)
+        public void FillPolygon(Graphics graphics, Point[] vertices, Triangle triangle, int m, float kd, float ks,
+            Bitmap BM, Vector3 LightColor, Vector3 ObjectColor, Vector3 light, bool IsTexture, Bitmap texture)
         {
+            int height = texture.Height;
+            int width = texture.Width;
             InitializeEdgeTable(vertices);
 
             // Determine the starting and ending scanlines for the polygon
@@ -169,12 +171,31 @@ namespace Triangle_mesh
                             if (cosnl < 0) cosnl = 0;
                             float cosvr = Vector3.Dot(V, Vector3.Normalize(R));
                             if (cosvr < 0) cosvr = 0;
-                            Vector3 color = kd * LightColor * ObjectColor * cosnl +
-                                ks * LightColor * ObjectColor * (float)Math.Pow(cosvr, m);
-                            Color c = Color.FromArgb((int)(color.X * 255) > 255 ? 255 : (int)(color.X * 255),
-                                (int)(color.Y * 255) > 255 ? 255 : (int)(color.Y * 255), (int)(color.Z * 255) > 255 ? 255 : (int)(color.Z * 255));
-                            
-                            BM.SetPixel(j + 250, scanline, c);
+                            if (!IsTexture)
+                            {
+                                Vector3 color = kd * LightColor * ObjectColor * cosnl +
+                                    ks * LightColor * ObjectColor * (float)Math.Pow(cosvr, m);
+                                Color c = Color.FromArgb((int)(color.X * 255) > 255 ? 255 : (int)(color.X * 255),
+                                    (int)(color.Y * 255) > 255 ? 255 : (int)(color.Y * 255), (int)(color.Z * 255) > 255 ? 255 : (int)(color.Z * 255));
+
+                                BM.SetPixel(j + 250, scanline, c);
+                            }
+                            else
+                            {
+                                float interpolatedU = w1 * triangle.Vertices[0].U +
+                                w2 * triangle.Vertices[1].U + w3 * triangle.Vertices[2].U;
+                                float interpolatedV = w1 * triangle.Vertices[0].V +
+                                w2 * triangle.Vertices[1].V + w3 * triangle.Vertices[2].V;
+                                Color pixelColor = texture.GetPixel((int)(interpolatedU * (width - 1)), (int)(interpolatedV * (height - 1)));
+                                Vector3 pixelVector = Vector3.Normalize(new Vector3(pixelColor.R, pixelColor.G, pixelColor.B));
+
+                                Vector3 color = kd * LightColor * pixelVector * cosnl +
+                                    ks * LightColor * pixelVector * (float)Math.Pow(cosvr, m);
+                                Color c = Color.FromArgb((int)(color.X * 255) > 255 ? 255 : (int)(color.X * 255),
+                                    (int)(color.Y * 255) > 255 ? 255 : (int)(color.Y * 255), (int)(color.Z * 255) > 255 ? 255 : (int)(color.Z * 255));
+
+                                BM.SetPixel(j + 250, scanline, c);
+                            }
                             //BM.SetPixel(j + 250, scanline + 1, c); // maybe change
                         }
                         // Draw a horizontal line between xStart and xEnd on the current scanline

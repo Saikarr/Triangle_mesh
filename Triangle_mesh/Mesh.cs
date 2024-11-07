@@ -68,7 +68,8 @@ namespace Triangle_mesh
             }
             return result;
         }
-        public void Draw(Bitmap BM, PaintEventArgs e, int m, float kd, float ks, Color lightcolor, Color objectcolor, Vector3 light, bool IsOnlyMesh, bool IsOnlyFill)
+        public void Draw(Bitmap BM, PaintEventArgs e, int m, float kd, float ks, Color lightcolor, Color objectcolor,
+            Vector3 light, bool IsOnlyMesh, bool IsOnlyFill, bool IsTexture, Bitmap texture)
         {
             //int m = 10;
             //float kd = 0.5F;
@@ -76,7 +77,7 @@ namespace Triangle_mesh
             //Vector3 V = new Vector3(0, 0, 1);
             //Vector3 LightColor = new Vector3(1, 1, 1);
             //Vector3 ObjectColor = new Vector3(1, 0, 0);
-            
+
             Vector3 LightColorV = Vector3.Normalize(new Vector3(lightcolor.R, lightcolor.G, lightcolor.B));
             if (lightcolor == Color.Black)
                 LightColorV = Vector3.Zero;
@@ -85,53 +86,66 @@ namespace Triangle_mesh
             if (objectcolor == Color.Black)
                 ObjectColorV = Vector3.Zero;
 
-            lock (ControlPoints)
+            if (!IsOnlyMesh)
             {
-                Vector3[,] controlPoints = ControlPoints;
-                for (int i = 0; i < 4; i++)
+                foreach (Triangle triangle in Triangles)
                 {
-                    for (int j = 0; j < 4; j++)
+                    //e.Graphics.DrawLine(Pens.Black, triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y, triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y);
+                    //e.Graphics.DrawLine(Pens.Black, triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y, triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y);
+                    //e.Graphics.DrawLine(Pens.Black, triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y, triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y);
+                    //Vector3 R = 2 * triangle.Vertices[0].NormalizedNormal * Vector3.Dot(triangle.Vertices[0].NormalizedNormal, light) - light;
+                    //float cosnl = Vector3.Dot(triangle.Vertices[0].NormalizedNormal, light);
+                    //if (cosnl < 0) cosnl = 0;
+                    //float cosvr = Vector3.Dot(V, Vector3.Normalize(R));
+                    //if (cosvr < 0) cosvr = 0;
+                    //Vector3 color = kd * LightColor * ObjectColor * cosnl +
+                    //    ks * LightColor * ObjectColor * (float)Math.Pow(cosvr, m);
+                    //Color c = Color.FromArgb((int)(color.X * 255) > 255 ? 255 : (int)(color.X * 255),
+                    //    (int)(color.Y * 255) > 255 ? 255 : (int)(color.Y * 255), (int)(color.Z * 255) > 255 ? 255 : (int)(color.Z * 255));
+                    //Brush brush = new SolidBrush(c);
+
+                    Point[] triangleVertices = new Point[] { new Point((int)triangle.Vertices[0].Position.X, (int)triangle.Vertices[0].Position.Y + 250),
+                    new Point((int)triangle.Vertices[1].Position.X, (int)triangle.Vertices[1].Position.Y + 250),
+                    new Point((int)triangle.Vertices[2].Position.X, (int)triangle.Vertices[2].Position.Y + 250)};
+
+                    TriangleFiller filler = new TriangleFiller();
+                    filler.FillPolygon(e.Graphics, triangleVertices, triangle, m, kd, ks, BM, LightColorV, ObjectColorV, light, IsTexture, texture);
+                    //e.Graphics.FillPolygon(brush, new PointF[] { new PointF(triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y),
+                    //    new PointF(triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y),
+                    //    new PointF(triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y)});
+        
+                }
+            }
+            if (!IsOnlyMesh && !IsOnlyFill)
+            {
+                lock (ControlPoints)
+                {
+                    Vector3[,] controlPoints = ControlPoints;
+                    for (int i = 0; i < 4; i++)
                     {
-                        e.Graphics.FillEllipse(Brushes.Black, controlPoints[i, j].X - 2, controlPoints[i, j].Y - 2, 4, 4);
-                        if (j != 3)
+                        for (int j = 0; j < 4; j++)
                         {
-                            e.Graphics.DrawLine(Pens.Black, controlPoints[i, j].X, controlPoints[i, j].Y, controlPoints[i, j + 1].X, controlPoints[i, j + 1].Y);
-                        }
-                        if (i != 3)
-                        {
-                            e.Graphics.DrawLine(Pens.Black, controlPoints[i, j].X, controlPoints[i, j].Y, controlPoints[i + 1, j].X, controlPoints[i + 1, j].Y);
+                            e.Graphics.FillEllipse(Brushes.Black, controlPoints[i, j].X - 2, controlPoints[i, j].Y - 2, 4, 4);
+                            if (j != 3)
+                            {
+                                e.Graphics.DrawLine(Pens.Black, controlPoints[i, j].X, controlPoints[i, j].Y, controlPoints[i, j + 1].X, controlPoints[i, j + 1].Y);
+                            }
+                            if (i != 3)
+                            {
+                                e.Graphics.DrawLine(Pens.Black, controlPoints[i, j].X, controlPoints[i, j].Y, controlPoints[i + 1, j].X, controlPoints[i + 1, j].Y);
+                            }
                         }
                     }
                 }
             }
-            foreach (Triangle triangle in Triangles)
+            if (!IsOnlyFill)
             {
-                //e.Graphics.DrawLine(Pens.Black, triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y, triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y);
-                //e.Graphics.DrawLine(Pens.Black, triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y, triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y);
-                //e.Graphics.DrawLine(Pens.Black, triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y, triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y);
-                //Vector3 R = 2 * triangle.Vertices[0].NormalizedNormal * Vector3.Dot(triangle.Vertices[0].NormalizedNormal, light) - light;
-                //float cosnl = Vector3.Dot(triangle.Vertices[0].NormalizedNormal, light);
-                //if (cosnl < 0) cosnl = 0;
-                //float cosvr = Vector3.Dot(V, Vector3.Normalize(R));
-                //if (cosvr < 0) cosvr = 0;
-                //Vector3 color = kd * LightColor * ObjectColor * cosnl +
-                //    ks * LightColor * ObjectColor * (float)Math.Pow(cosvr, m);
-                //Color c = Color.FromArgb((int)(color.X * 255) > 255 ? 255 : (int)(color.X * 255),
-                //    (int)(color.Y * 255) > 255 ? 255 : (int)(color.Y * 255), (int)(color.Z * 255) > 255 ? 255 : (int)(color.Z * 255));
-                //Brush brush = new SolidBrush(c);
-
-                Point[] triangleVertices = new Point[] { new Point((int)triangle.Vertices[0].Position.X, (int)triangle.Vertices[0].Position.Y + 250),
-                    new Point((int)triangle.Vertices[1].Position.X, (int)triangle.Vertices[1].Position.Y + 250),
-                    new Point((int)triangle.Vertices[2].Position.X, (int)triangle.Vertices[2].Position.Y + 250)};
-
-                TriangleFiller filler = new TriangleFiller();
-                filler.FillPolygon(e.Graphics, triangleVertices, triangle, m, kd, ks, BM, LightColorV, ObjectColorV, light);
-                //e.Graphics.FillPolygon(brush, new PointF[] { new PointF(triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y),
-                //    new PointF(triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y),
-                //    new PointF(triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y)});
-                e.Graphics.DrawLine(Pens.Black, triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y, triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y);
-                e.Graphics.DrawLine(Pens.Black, triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y, triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y);
-                e.Graphics.DrawLine(Pens.Black, triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y, triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y);
+                foreach (Triangle triangle in Triangles)
+                {
+                    e.Graphics.DrawLine(Pens.Black, triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y, triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y);
+                    e.Graphics.DrawLine(Pens.Black, triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y, triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y);
+                    e.Graphics.DrawLine(Pens.Black, triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y, triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y);
+                }
             }
         }
 
@@ -163,12 +177,12 @@ namespace Triangle_mesh
                     Vector3 vtan3 = VTangent(u2, v1);
                     Vector3 vtan4 = VTangent(u2, v2);
 
-                    Triangles[i, j] = new Triangle([new Vertex(p1, utan1, vtan1),
-                        new Vertex(p2, utan2, vtan2),
-                        new Vertex(p3, utan3, vtan3)]);
-                    Triangles[i + 1, j] = new Triangle([new Vertex(p4, utan4, vtan4),
-                        new Vertex(p2, utan2, vtan2),
-                        new Vertex(p3, utan3, vtan3)]);
+                    Triangles[i, j] = new Triangle([new Vertex(p1, utan1, vtan1, u1, v1),
+                        new Vertex(p2, utan2, vtan2, u1, v2),
+                        new Vertex(p3, utan3, vtan3, u2, v1)]);
+                    Triangles[i + 1, j] = new Triangle([new Vertex(p4, utan4, vtan4, u2, v2),
+                        new Vertex(p2, utan2, vtan2, u1, v2),
+                        new Vertex(p3, utan3, vtan3, u2, v1)]);
 
                     //Triangles[i, j] = new Triangle([new Vertex(p1),
                     //    new Vertex(p2),

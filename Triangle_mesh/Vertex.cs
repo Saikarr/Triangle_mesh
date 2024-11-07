@@ -9,6 +9,8 @@ namespace Triangle_mesh
 {
     public class Vertex
     {
+        public float U {  get; set; }
+        public float V { get; set; }
         public Vector3 OriginalPosition { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 Normal { get; set; }
@@ -18,7 +20,7 @@ namespace Triangle_mesh
         public Vector3 OriginalUTangent { get; set; }
         public Vector3 VTangent { get; set; }
         public Vector3 OriginalVTangent { get; set; }
-        public Vertex(Vector3 position, Vector3 utangent, Vector3 vtangent)
+        public Vertex(Vector3 position, Vector3 utangent, Vector3 vtangent, float u, float v)
         {
             OriginalPosition = position;
             Position = position;
@@ -30,6 +32,8 @@ namespace Triangle_mesh
             Normal = normal;
             OriginalNormal = normal;
             NormalizedNormal = Vector3.Normalize(normal);
+            U = u;
+            V = v;
         }
 
         public void Rotate(int alpha, int beta)
