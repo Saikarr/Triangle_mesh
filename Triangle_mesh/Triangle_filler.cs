@@ -159,6 +159,8 @@ namespace Triangle_mesh
                             float w1 = (d11 * d20 - d01 * d21) / denom;
                             float w2 = (d00 * d21 - d01 * d20) / denom;
                             float w3 = 1.0f - w1 - w2;
+                            if (w3 < 0)
+                                w3 = 0;
 
                             Vector3 position = new Vector3(j, scanline, w1 * triangle.Vertices[0].Position.Z +
                                 w2 * triangle.Vertices[1].Position.Z + w3 * triangle.Vertices[2].Position.Z);
@@ -186,8 +188,14 @@ namespace Triangle_mesh
                                 w2 * triangle.Vertices[1].U + w3 * triangle.Vertices[2].U;
                                 float interpolatedV = w1 * triangle.Vertices[0].V +
                                 w2 * triangle.Vertices[1].V + w3 * triangle.Vertices[2].V;
+                                if (interpolatedU > 1)
+                                    interpolatedU = 1;
+                                if (interpolatedV > 1)
+                                    interpolatedV = 1;
                                 Color pixelColor = texture.GetPixel((int)(interpolatedU * (width - 1)), (int)(interpolatedV * (height - 1)));
                                 Vector3 pixelVector = Vector3.Normalize(new Vector3(pixelColor.R, pixelColor.G, pixelColor.B));
+                                if (pixelColor.R == 0 && pixelColor.G == 0 && pixelColor.B == 0)
+                                    pixelVector = new Vector3(0, 0, 0);
 
                                 Vector3 color = kd * LightColor * pixelVector * cosnl +
                                     ks * LightColor * pixelVector * (float)Math.Pow(cosvr, m);

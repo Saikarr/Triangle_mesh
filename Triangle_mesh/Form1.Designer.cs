@@ -258,7 +258,6 @@
             textureRadioButton.Name = "textureRadioButton";
             textureRadioButton.Size = new Size(78, 24);
             textureRadioButton.TabIndex = 19;
-            textureRadioButton.TabStop = true;
             textureRadioButton.Text = "Texture";
             textureRadioButton.UseVisualStyleBackColor = true;
             textureRadioButton.CheckedChanged += textureRadioButton_CheckedChanged;
@@ -266,6 +265,7 @@
             // colorRadioButton
             // 
             colorRadioButton.AutoSize = true;
+            colorRadioButton.Checked = true;
             colorRadioButton.Location = new Point(6, 345);
             colorRadioButton.Name = "colorRadioButton";
             colorRadioButton.Size = new Size(105, 24);
@@ -273,7 +273,6 @@
             colorRadioButton.TabStop = true;
             colorRadioButton.Text = "Same color";
             colorRadioButton.UseVisualStyleBackColor = true;
-            colorRadioButton.CheckedChanged += colorRadioButton_CheckedChanged;
             // 
             // stopButton
             // 

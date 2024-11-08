@@ -25,14 +25,14 @@ namespace Triangle_mesh
         {
             string path = "../../../ControlPoints2.txt";
             mesh = new Mesh(Mesh.ReadControlPoints(path));
-            string path2 = "C:\\Users\\xx-ma\\OneDrive\\Obrazy\\Zrzuty ekranu\\Screenshot 2024-02-17 020028.png";
+            string path2 = "../../../Teemofrompaint.png";
             Texture = new Bitmap(path2);
             Task.Run(() =>
             {
                 //Thread.Sleep(100);
                 while (true)
                 {
-                    Thread.Sleep(50);
+                    Thread.Sleep(80);
                     BeginInvoke(new Action(() =>
                     {
                         pictureBox1.Invalidate();
@@ -139,14 +139,9 @@ namespace Triangle_mesh
             }
         }
 
-        private void colorRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            IsTexture = !colorRadioButton.Checked;
-        }
-
         private void textureRadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            IsTexture = !colorRadioButton.Checked;
+            IsTexture = textureRadioButton.Checked;
         }
     }
 }
