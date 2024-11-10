@@ -109,11 +109,14 @@ namespace Triangle_mesh
                     new Point((int)triangle.Vertices[2].Position.X, (int)triangle.Vertices[2].Position.Y + 250)};
 
                     TriangleFiller filler = new TriangleFiller();
-                    filler.FillPolygon(e.Graphics, triangleVertices, triangle, m, kd, ks, BM, LightColorV, ObjectColorV, light, IsTexture, texture);
+                    lock (triangle)
+                    {
+                        filler.FillPolygon(e.Graphics, triangleVertices, triangle, m, kd, ks, BM, LightColorV, ObjectColorV, light, IsTexture, texture);
+                    }
                     //e.Graphics.FillPolygon(brush, new PointF[] { new PointF(triangle.Vertices[0].Position.X, triangle.Vertices[0].Position.Y),
                     //    new PointF(triangle.Vertices[1].Position.X, triangle.Vertices[1].Position.Y),
                     //    new PointF(triangle.Vertices[2].Position.X, triangle.Vertices[2].Position.Y)});
-        
+
                 }
             }
             if (!IsOnlyMesh && !IsOnlyFill)
@@ -227,7 +230,7 @@ namespace Triangle_mesh
             return tangent;
         }
 
-        public void Rotate(int alpha, int beta)
+        public void Rotate(int alpha, int beta, bool IsNormalMap, Bitmap NormalMap)
         {
             double alphaRad = alpha * Math.PI / 180;
             double betaRad = beta * Math.PI / 180;
@@ -255,7 +258,10 @@ namespace Triangle_mesh
             {
                 foreach (Triangle triangle in Triangles)
                 {
-                    triangle.Rotate(alpha, beta);
+                    lock (triangle)
+                    {
+                        triangle.Rotate(alpha, beta, IsNormalMap, NormalMap);
+                    }
                 }
             }
         }

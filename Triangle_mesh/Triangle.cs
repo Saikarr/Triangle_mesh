@@ -27,11 +27,11 @@ namespace Triangle_mesh
             g.DrawLine(pen, Vertices[2].Position.X, Vertices[2].Position.Y, Vertices[0].Position.X, Vertices[0].Position.Y);
         }
 
-        public void Rotate(int alpha, int beta)
+        public void Rotate(int alpha, int beta, bool IsNormalMap, Bitmap NormalMap)
         {
             for (int i = 0; i < 3; i++)
             {
-                Vertices[i].Rotate(alpha, beta);
+                Vertices[i].Rotate(alpha, beta, IsNormalMap, NormalMap);
             }
         }
     }

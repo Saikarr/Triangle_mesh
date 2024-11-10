@@ -10,7 +10,10 @@ namespace Triangle_mesh
         private bool IsOnlyMesh = false;
         private bool IsOnlyFill = false;
         private bool IsTexture = false;
+        private bool IsNormalMap = false;
+        private bool IsSleeping = false;
         private Bitmap Texture;
+        private Bitmap NormalMap;
         private Mesh mesh;
         private Color objectcolor = Color.Red;
         private Color lightcolor = Color.White;
@@ -23,37 +26,50 @@ namespace Triangle_mesh
 
         public void Initialize()
         {
-            string path = "../../../ControlPoints2.txt";
+            string path = "../../../ControlPoints.txt";
             mesh = new Mesh(Mesh.ReadControlPoints(path));
             string path2 = "../../../Teemofrompaint.png";
             Texture = new Bitmap(path2);
+            string path3 = "../../../brick_normalmap.png";
+            NormalMap = new Bitmap(path3);
             Task.Run(() =>
             {
-                //Thread.Sleep(100);
+                Thread.Sleep(100);
                 while (true)
                 {
-                    Thread.Sleep(80);
+                    Thread.Sleep(10);
                     BeginInvoke(new Action(() =>
                     {
                         pictureBox1.Invalidate();
-                        //light = new Vector3(100 * (float)Math.Sin(DateTime.Now.Millisecond / 100), 100 * (float)Math.Cos(DateTime.Now.Millisecond / 100), -200);
                         if (IsAnimated)
                         {
                             long time = DateTimeOffset.Now.ToUnixTimeMilliseconds() / 100;
-                            light = new Vector3(100 * (float)Math.Sin(time), 100 * (float)Math.Cos(time), zTrackBar.Value);
+                            light = new Vector3(100 * (float)Math.Sin(time), 100 * (float)Math.Cos(time) + 100, zTrackBar.Value);
                         }
                     }));
-
-                    //pictureBox1.Invalidate();
+                    if (IsSleeping)
+                    {
+                        Thread.Sleep(200);
+                        IsSleeping = false;
+                    }
                 }
             });
-            //new Task(() => MainLoop()).Start();
+
         }
         public void MainLoop()
         {
             while (true)
             {
                 pictureBox1.Invalidate();
+                if (IsAnimated)
+                {
+                    long time = DateTimeOffset.Now.ToUnixTimeMilliseconds() / 100;
+                    light = new Vector3(100 * (float)Math.Sin(time), 100 * (float)Math.Cos(time) + 100, zTrackBar.Value);
+                }
+                while (IsSleeping)
+                {
+                    Thread.Sleep(200);
+                }   
             }
         }
 
@@ -72,25 +88,26 @@ namespace Triangle_mesh
 
         private void alphaTrackBar_ValueChanged(object sender, EventArgs e)
         {
-            mesh.Rotate(alphaTrackBar.Value, betaTrackBar.Value);
+            mesh.Rotate(alphaTrackBar.Value, betaTrackBar.Value, IsNormalMap, NormalMap);
             //mesh.CalculateTriangles(triangleTrackBar.Value);
         }
 
         private void betaTrackBar_ValueChanged(object sender, EventArgs e)
         {
-            mesh.Rotate(alphaTrackBar.Value, betaTrackBar.Value);
+            mesh.Rotate(alphaTrackBar.Value, betaTrackBar.Value, IsNormalMap, NormalMap);
             //mesh.CalculateTriangles(triangleTrackBar.Value);
         }
 
         private void triangleTrackBar_ValueChanged(object sender, EventArgs e)
         {
             mesh.CalculateTriangles(triangleTrackBar.Value);
-            mesh.Rotate(alphaTrackBar.Value, betaTrackBar.Value);
+            mesh.Rotate(alphaTrackBar.Value, betaTrackBar.Value, IsNormalMap, NormalMap);
         }
 
         private void objectColorButton_Click(object sender, EventArgs e)
         {
             //ColorDialog MyDialog = new ColorDialog();
+            IsSleeping = true;
             colorDialog.Color = objectcolor;
 
             if (colorDialog.ShowDialog() == DialogResult.OK)
@@ -102,6 +119,7 @@ namespace Triangle_mesh
 
         private void lightColorButton_Click(object sender, EventArgs e)
         {
+            IsSleeping = true;
             colorDialog.Color = lightcolor;
 
             if (colorDialog.ShowDialog() == DialogResult.OK)
@@ -142,6 +160,12 @@ namespace Triangle_mesh
         private void textureRadioButton_CheckedChanged(object sender, EventArgs e)
         {
             IsTexture = textureRadioButton.Checked;
+        }
+
+        private void normalVectorCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            IsNormalMap = normalVectorCheckbox.Checked;
+            mesh.Rotate(alphaTrackBar.Value, betaTrackBar.Value, IsNormalMap, NormalMap);
         }
     }
 }
